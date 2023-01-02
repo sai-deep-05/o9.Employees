@@ -1,0 +1,9 @@
+﻿namespace o9.EmployeesAPI.Models
+{
+	public class MongoDBSettings
+	{
+		public string ConnectionString { get; set; }
+
+		public string DatabaseName { get; set; }
+	}
+}

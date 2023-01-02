@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\o9.EmployeesAPI.props" />
+</Project>
