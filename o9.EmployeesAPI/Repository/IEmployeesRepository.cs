@@ -4,13 +4,13 @@ namespace o9.EmployeesAPI.Repository;
 
 public interface IEmployeesRepository
 {
-	Task<List<Employee>> GetAllAsync();
+	Task<List<Models.Employee>> GetAllAsync();
 
-	Task<Employee> GetByIdAsync(string id);
+	Task<Models.Employee> GetByIdAsync(string id);
 
-	Task CreateAsync(Employee newEmployee);
+	Task CreateAsync(Models.Employee newEmployee);
 
-	Task UpdateAsync(Employee employeeToUpdate);
+	Task UpdateAsync(Models.Employee employeeToUpdate);
 
 	Task DeleteAsync(string id);
 }

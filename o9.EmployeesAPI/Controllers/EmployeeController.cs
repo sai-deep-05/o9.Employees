@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
+﻿using Microsoft.AspNetCore.Mvc;
 using o9.EmployeesAPI.Models;
-using o9.EmployeesAPI.Repository;
 using o9.EmployeesAPI.Services;
+using o9.EmployeesAPI.DTO_Models;
 
 namespace o9.EmployeesAPI.Controllers
 {
@@ -21,8 +19,8 @@ namespace o9.EmployeesAPI.Controllers
 
 		public async Task<ActionResult<Employee>> Get()
 		{
-			var employee=await _employeeServices.GetAllAsync();
-			return Ok(employee);
+			var employees=await _employeeServices.GetAllAsync();
+			return Ok(employees);
 		}
 
 		[HttpGet]
@@ -35,26 +33,23 @@ namespace o9.EmployeesAPI.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Post(Employee newEmployee)
+		public async Task<IActionResult> Post(EmployeeDTO newEmployee)
 		{
-			//String[] Names = newEmployee.EmployeeName.Split(" ");
-			//if(Names.Length<2)
-			//	return Content("Full Name not entered");
-			//newEmployee.FirstName= Names[0];
-			//newEmployee.LastName= Names[1];
-			await _employeeServices.CreateAsync(newEmployee);
-			return Ok();
+			EmployeeDTO emp = new EmployeeDTO();
+		    await _employeeServices.CreateAsync(newEmployee);
+			return CreatedAtAction(nameof(Get),new {id=newEmployee.Id},newEmployee);
+			
 		}
 
 		[HttpPut]
-		public async Task<IActionResult> Put(Employee employeeToUpdate)
+		public async Task<IActionResult> Put(EmployeeDTO employeeToUpdate)
 		{
 			var employeeid=await _employeeServices.GetByIdAsync(employeeToUpdate.Id);
 			if(employeeid==null)
 				return NotFound();
 
 			await _employeeServices.UpdateAsync(employeeToUpdate);
-			return NoContent();
+			return CreatedAtAction( nameof(Get),new { id = employeeToUpdate.Id },employeeToUpdate);
 		}
 
 		[HttpDelete]

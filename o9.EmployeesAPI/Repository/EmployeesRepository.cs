@@ -1,33 +1,34 @@
 ﻿using MongoDB.Driver;
-using o9.EmployeesAPI.Models;
+
 
 namespace o9.EmployeesAPI.Repository;
 
 public class EmployeesRepository: IEmployeesRepository
 {
-	private readonly IMongoCollection<Employee> _mongoEmployeeCollection;
+	private readonly IMongoCollection<Models.Employee> _mongoEmployeeCollection;
 
 	public EmployeesRepository(IMongoDatabase mongoDatabase)
 	{
-		_mongoEmployeeCollection = mongoDatabase.GetCollection<Employee>("Employees");
+		_mongoEmployeeCollection = mongoDatabase.GetCollection<Models.Employee>("Employees");
 	}
 
-	public async Task<List<Employee>> GetAllAsync()
+	public async Task<List<Models.Employee>> GetAllAsync()
 	{
 		return await _mongoEmployeeCollection.Find(_ => true).ToListAsync();
 	}
 
-	public async Task<Employee> GetByIdAsync(string id)
+	public async Task<Models.Employee> GetByIdAsync(string id)
 	{
-		return await _mongoEmployeeCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+		return (await _mongoEmployeeCollection.FindAsync(x => x.Id == id)).FirstOrDefault();
 	}
 
-	public async Task CreateAsync(Employee newEmployee)
+	public async Task CreateAsync(Models.Employee newEmployee)
 	{
+
 		 await _mongoEmployeeCollection.InsertOneAsync(newEmployee);
 	}
 
-	public async Task UpdateAsync(Employee employeeToUpdate)
+	public async Task UpdateAsync(Models.Employee employeeToUpdate)
 	{
 		await _mongoEmployeeCollection.ReplaceOneAsync(_ => _.Id == employeeToUpdate.Id, employeeToUpdate);
 	}

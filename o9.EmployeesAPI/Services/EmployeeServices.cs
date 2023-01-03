@@ -1,37 +1,78 @@
-﻿using MongoDB.Driver;
+﻿
 using o9.EmployeesAPI.Models;
 using o9.EmployeesAPI.Repository;
+using o9.EmployeesAPI.DTO_Models;
+
 
 namespace o9.EmployeesAPI.Services
 {
 	public class EmployeeServices : IEmployeeServices
 	{
 		private readonly IEmployeesRepository _employeeRepository;
+		
 
 		public EmployeeServices(IEmployeesRepository employeeRepository)
 		{
 			_employeeRepository = employeeRepository;
 		}
 
-		public async Task<List<Employee>> GetAllAsync()
+		public async Task<List<DTO_Models.EmployeeDTO>> GetAllAsync()
 		{
-			return await _employeeRepository.GetAllAsync();
+			var employees = new List<Employee>();
+			var employeeDTOs=new List<EmployeeDTO>();
+			 employees= await _employeeRepository.GetAllAsync();
+			 employeeDTOs= new List<EmployeeDTO>();
+			foreach (Employee employee in employees)
+			{
+				EmployeeDTO empDTO= new EmployeeDTO();
+				empDTO.EmployeeName= employee.FirstName + " " + employee.LastName;
+				empDTO.EmployeeId = employee.EmployeeId;
+				empDTO.Id = employee.Id;
+				empDTO.Department = employee.Department;
+				employeeDTOs.Add( empDTO );
+			}
+			return employeeDTOs;
 		}
 
-		public async Task<Employee> GetByIdAsync(string id)
+		public async Task<DTO_Models.EmployeeDTO> GetByIdAsync(string id)
 		{
-			return await _employeeRepository.GetByIdAsync(id);
+			Employee employee= await _employeeRepository.GetByIdAsync(id);
+			EmployeeDTO empDTO= new EmployeeDTO();
+			empDTO.EmployeeName = employee.FirstName +" "+ employee.LastName;
+			empDTO.EmployeeId = employee.EmployeeId;
+			empDTO.Id = employee.Id;
+			empDTO.Department= employee.Department;
+			return empDTO;
+
 		}
 
-		public async Task CreateAsync(Employee newEmployee)
+		public async Task CreateAsync(DTO_Models.EmployeeDTO newEmployee)
 		{
-
-			await _employeeRepository.CreateAsync(newEmployee);
+			Employee employee = new Employee();
+			String[] Names = newEmployee.EmployeeName.Split(" ");
+			if (Names.Length < 2)
+				return;
+			//employee.Id= newEmployee.Id;
+			employee.EmployeeId= newEmployee.EmployeeId;
+			employee.FirstName= Names[0];
+			employee.LastName= Names[1];
+			employee.Department=newEmployee.Department;
+			await _employeeRepository.CreateAsync(employee);
+			
 		}
 
-		public async Task UpdateAsync(Employee employeeToUpdate)
+		public async Task UpdateAsync(DTO_Models.EmployeeDTO employeeToUpdate)
 		{
-			await _employeeRepository.UpdateAsync(employeeToUpdate);
+			Employee employee = new Employee();
+			String[] Names = employeeToUpdate.EmployeeName.Split(" ");
+			if (Names.Length < 2)
+				return;
+			employee.Id = employeeToUpdate.Id;
+			employee.EmployeeId = employeeToUpdate.EmployeeId;
+			employee.FirstName = Names[0];
+			employee.LastName = Names[1];
+			employee.Department = employeeToUpdate.Department;
+			await _employeeRepository.UpdateAsync(employee);
 		}
 
 		public async Task DeleteAsync(string id)

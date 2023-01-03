@@ -13,8 +13,13 @@ namespace o9.EmployeesAPI.Models
 		[BsonElement("EmployeeId")]
 		public int EmployeeId { get; set; }
 
-		[BsonElement("EmployeeName")]
-		public string EmployeeName { get; set; }
+		[BsonElement("FirstName")]
+		public string FirstName { get; set; }
+
+
+		[BsonElement("LastName")]
+		public string LastName { get; set; }
+
 
 		[BsonElement("Department")]
 		public string Department { get; set; }
