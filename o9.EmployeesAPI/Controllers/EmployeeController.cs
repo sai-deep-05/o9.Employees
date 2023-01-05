@@ -17,7 +17,7 @@ namespace o9.EmployeesAPI.Controllers
 
 		[HttpGet]
 
-		public async Task<ActionResult<Employee>> Get()
+		public async Task<ActionResult<EmployeeDTO>> Get()
 		{
 			var employees=await _employeeServices.GetAllAsync();
 			return Ok(employees);
@@ -38,6 +38,7 @@ namespace o9.EmployeesAPI.Controllers
 			EmployeeDTO emp = new EmployeeDTO();
 		    await _employeeServices.CreateAsync(newEmployee);
 			return CreatedAtAction(nameof(Get),new {id=newEmployee.Id},newEmployee);
+			//return Ok();
 			
 		}
 
@@ -48,8 +49,10 @@ namespace o9.EmployeesAPI.Controllers
 			if(employeeid==null)
 				return NotFound();
 
-			await _employeeServices.UpdateAsync(employeeToUpdate);
-			return CreatedAtAction( nameof(Get),new { id = employeeToUpdate.Id },employeeToUpdate);
+			await _employeeServices.UpdateEmployeeDataAsync(employeeToUpdate);
+			//return CreatedAtAction( nameof(Get),new { id = employeeToUpdate.Id },employeeToUpdate);
+			//return Ok();
+			return Created("",employeeToUpdate);
 		}
 
 		[HttpDelete]
@@ -58,7 +61,7 @@ namespace o9.EmployeesAPI.Controllers
 		{
 			var employeeid = _employeeServices.GetByIdAsync(id);
 			if(employeeid==null)
-				return NotFound();
+				return NotFound("Invalid key");
 			await _employeeServices.DeleteAsync(id);
 			return NoContent();
 		}

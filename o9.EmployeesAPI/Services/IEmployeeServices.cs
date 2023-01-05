@@ -11,7 +11,7 @@ namespace o9.EmployeesAPI.Services
 
 		Task CreateAsync(DTO_Models.EmployeeDTO newEmployee);
 
-		Task UpdateAsync(DTO_Models.EmployeeDTO employeeToUpdate);
+		Task UpdateEmployeeDataAsync(DTO_Models.EmployeeDTO employeeToUpdate);
 		
 		Task DeleteAsync(string id);
 	}

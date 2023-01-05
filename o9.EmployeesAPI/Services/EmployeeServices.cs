@@ -16,27 +16,34 @@ namespace o9.EmployeesAPI.Services
 			_employeeRepository = employeeRepository;
 		}
 
+
 		public async Task<List<DTO_Models.EmployeeDTO>> GetAllAsync()
 		{
-			var employees = new List<Employee>();
-			var employeeDTOs=new List<EmployeeDTO>();
-			 employees= await _employeeRepository.GetAllAsync();
-			 employeeDTOs= new List<EmployeeDTO>();
-			foreach (Employee employee in employees)
+			
+			
+			 var employees= await _employeeRepository.GetAllAsync();
+			 var employeeDTOs= new List<EmployeeDTO>();
+			if (employees != null)
 			{
-				EmployeeDTO empDTO= new EmployeeDTO();
-				empDTO.EmployeeName= employee.FirstName + " " + employee.LastName;
-				empDTO.EmployeeId = employee.EmployeeId;
-				empDTO.Id = employee.Id;
-				empDTO.Department = employee.Department;
-				employeeDTOs.Add( empDTO );
+				foreach (Employee employee in employees)
+				{
+					EmployeeDTO empDTO = new EmployeeDTO();
+					empDTO.EmployeeName = employee.FirstName + " " + employee.LastName;
+					empDTO.EmployeeId = employee.EmployeeId;
+					empDTO.Id = employee.Id;
+					empDTO.Department = employee.Department;
+					employeeDTOs.Add(empDTO);
+				}
 			}
+			
 			return employeeDTOs;
 		}
 
 		public async Task<DTO_Models.EmployeeDTO> GetByIdAsync(string id)
 		{
 			Employee employee= await _employeeRepository.GetByIdAsync(id);
+			if (employee == null)
+				return null;
 			EmployeeDTO empDTO= new EmployeeDTO();
 			empDTO.EmployeeName = employee.FirstName +" "+ employee.LastName;
 			empDTO.EmployeeId = employee.EmployeeId;
@@ -58,10 +65,11 @@ namespace o9.EmployeesAPI.Services
 			employee.LastName= Names[1];
 			employee.Department=newEmployee.Department;
 			await _employeeRepository.CreateAsync(employee);
+			// use call backs
 			
 		}
 
-		public async Task UpdateAsync(DTO_Models.EmployeeDTO employeeToUpdate)
+		public async Task UpdateEmployeeDataAsync(DTO_Models.EmployeeDTO employeeToUpdate)
 		{
 			Employee employee = new Employee();
 			String[] Names = employeeToUpdate.EmployeeName.Split(" ");
@@ -73,6 +81,7 @@ namespace o9.EmployeesAPI.Services
 			employee.LastName = Names[1];
 			employee.Department = employeeToUpdate.Department;
 			await _employeeRepository.UpdateAsync(employee);
+			
 		}
 
 		public async Task DeleteAsync(string id)
