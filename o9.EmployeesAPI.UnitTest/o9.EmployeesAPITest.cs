@@ -9,7 +9,6 @@ using o9.EmployeesAPI.DTO_Models;
 using MongoDB.Driver;
 using o9.EmployeesAPI.Repository;
 
-
 namespace o9.EmployeesAPI.UnitTest
 
 
@@ -18,9 +17,13 @@ namespace o9.EmployeesAPI.UnitTest
 	{
 		private readonly Mock<IEmployeeServices> employeeservices;
 		private readonly MockRepository mockRepository;
+		private Employee _employeeCallBackObject;
+		private Employee createAsync_employeeCallBackObject;
+		private string deleteAsync_employeeCallBackObject;
+
 		//private readonly Mock<IEmployeesRepository> employeeRepoMock = new Mock<IEmployeesRepository>().Object;
 		//private readonly EmployeeServices _sut = new EmployeeServices();
-		
+
 		public EmployeesAPITest()
 		{
 			this.mockRepository = new MockRepository(MockBehavior.Loose);
@@ -33,9 +36,10 @@ namespace o9.EmployeesAPI.UnitTest
 		{
 
 			//Arrange
-		    var repository = new Mock<IEmployeesRepository>();  
-			var empservices = new EmployeeServices(repository.Object);         
-			repository.Setup(x => x.GetAllAsync()).ReturnsAsync(GetEmployeeList());
+		    var _mockrepository = new Mock<IEmployeesRepository>();
+			_mockrepository.Setup(x => x.GetAllAsync()).ReturnsAsync(GetEmployeeList());
+			var empservices = new EmployeeServices(_mockrepository.Object);         
+			
 
 			
 			//Act
@@ -106,9 +110,9 @@ namespace o9.EmployeesAPI.UnitTest
 			};
 		***/
 
-			var repository = new Mock<IEmployeesRepository>();         
-			var empservices = new EmployeeServices(repository.Object); 
-			repository.Setup(x => x.GetByIdAsync(Id)).ReturnsAsync(emp);
+			var _mockrepository = new Mock<IEmployeesRepository>();         
+			var empservices = new EmployeeServices(_mockrepository.Object); 
+			_mockrepository.Setup(x => x.GetByIdAsync(Id)).ReturnsAsync(emp);
 			
 			//Act
 
@@ -136,23 +140,114 @@ namespace o9.EmployeesAPI.UnitTest
 				Department = "WebAPI"
 			};
 
-			var repository = new Mock<IEmployeesRepository>();
-			var empservices = new EmployeeServices(repository.Object);
-			repository.Setup(x => x.UpdateAsync(It.IsAny<Employee>())).Verifiable();
+			var _mockrepository = new Mock<IEmployeesRepository>();
+			var empservices = new EmployeeServices(_mockrepository.Object);
+			_mockrepository.Setup(x => x.UpdateAsync(It.IsAny<Employee>())).Callback<Employee>(UpdateAsyncCallBack);
 			
 			//Act
 			 await empservices.UpdateEmployeeDataAsync(empDTO);
-			
+
 
 			//Assert
-			repository.Verify(x => x.UpdateAsync(It.IsAny<Employee>()),Times.Once);
+			_employeeCallBackObject.FirstName.Should().Be("TEMP");
+			_employeeCallBackObject.LastName.Should().Be("A");
+			_mockrepository.Verify(x => x.UpdateAsync(It.IsAny<Employee>()),Times.Once);
 
 
+		}
+
+		private void UpdateAsyncCallBack(Employee obj)
+		{
+			_employeeCallBackObject = obj;
+
+			
 		}
 
 		[Fact]
 		public async Task CreateAsync_IsWorking()
 		{
+			//Arrange
+			var empDTO = new EmployeeDTO
+			{
+				Id = "Id",
+				EmployeeId = 2,
+				EmployeeName = "New Value",
+				Department = "WebAPI"
+			};
+
+			var _mockrepository = new Mock<IEmployeesRepository>();
+			var empservices = new EmployeeServices(_mockrepository.Object);
+			_mockrepository.Setup(x => x.CreateAsync(It.IsAny<Employee>())).Callback<Employee>(CreateAsyncCallBack);
+
+			//Act
+			await empservices.CreateAsync(empDTO);
+
+
+			//Assert
+			createAsync_employeeCallBackObject.FirstName.Should().Be("New");
+			createAsync_employeeCallBackObject.LastName.Should().Be("Value");
+			_mockrepository.Verify(x => x.CreateAsync(It.IsAny<Employee>()), Times.Once);
+
+		}
+
+		private void CreateAsyncCallBack(Employee obj)
+		{
+			createAsync_employeeCallBackObject = obj;
+		}
+
+		/***	[Fact]
+			public async Task Delete_IsWorking()
+			{
+				EmployeeDTO empDTO = new EmployeeDTO
+				{
+					Id = "63b3e8f7295b3b5293f506b3",
+					EmployeeId=5,
+					EmployeeName="Sai Deep",
+					Department="WebAPI"
+
+				};
+				//Arrange
+				var _mockrepository = new Mock<IEmployeesRepository>();
+				var empservices = new EmployeeServices(_mockrepository.Object);
+
+				_mockrepository.Setup(x => x.DeleteAsync(empDTO.Id)).Callback<string>(DeleteAsyncCallBack);
+
+				//Act
+				await empservices.DeleteAsync(empDTO.Id);
+
+				//Assert
+				deleteAsync_employeeCallBackObject.Should().Be(null);
+
+
+
+			}
+
+			private void DeleteAsyncCallBack(string obj)
+			{
+				deleteAsync_employeeCallBackObject = obj;
+			} ***/
+
+		[Fact]
+		public async Task DeleteAsync_IsWorking()
+		{
+			//Arrange
+			EmployeeDTO empDTO = new EmployeeDTO
+			{
+				Id = "63b3e8f7295b3b5293f506b3",
+				EmployeeId = 5,
+				EmployeeName = "Sai Deep",
+				Department = "WebAPI"
+
+			};
+			var _mockrepository = new Mock<IEmployeesRepository>();
+			var services = new EmployeeServices(_mockrepository.Object);
+			_mockrepository.Setup(x => x.DeleteAsync(empDTO.Id));
+
+			//Act
+			await services.DeleteAsync(empDTO.Id);
+
+			//Assert
+			_mockrepository.Verify(x => x.DeleteAsync(empDTO.Id));
 
 		}
 	}
