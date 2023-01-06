@@ -37,8 +37,8 @@ namespace o9.EmployeesAPI.Controllers
 		{
 			EmployeeDTO emp = new EmployeeDTO();
 		    await _employeeServices.CreateAsync(newEmployee);
-			return CreatedAtAction(nameof(Get),new {id=newEmployee.Id},newEmployee);
-			//return Ok();
+			return Created("", newEmployee);
+			
 			
 		}
 
@@ -50,8 +50,6 @@ namespace o9.EmployeesAPI.Controllers
 				return NotFound();
 
 			await _employeeServices.UpdateEmployeeDataAsync(employeeToUpdate);
-			//return CreatedAtAction( nameof(Get),new { id = employeeToUpdate.Id },employeeToUpdate);
-			//return Ok();
 			return Created("",employeeToUpdate);
 		}
 
