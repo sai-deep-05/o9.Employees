@@ -59,15 +59,12 @@ namespace o9.EmployeesAPI.Services
 			String[] Names = newEmployee.EmployeeName.Split(" ");
 			if (Names.Length < 2)
 				return;
-			//employee.Id= newEmployee.Id;
 			employee.EmployeeId= newEmployee.EmployeeId;
 			employee.FirstName= Names[0];
 			employee.LastName= Names[1];
 			employee.Department=newEmployee.Department;
 			await _employeeRepository.CreateAsync(employee);
 
-			// use call backs
-			
 		}
 
 		public async Task UpdateEmployeeDataAsync(DTO_Models.EmployeeDTO employeeToUpdate)
@@ -88,8 +85,6 @@ namespace o9.EmployeesAPI.Services
 		public async Task DeleteAsync(string id)
 		{
 			await _employeeRepository.DeleteAsync(id);
-
-
 		}
 	}
 }
